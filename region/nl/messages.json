@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "Een aanpasbare startpagina met klok, dagen, muziekspeler en snelkoppelingen.",
+        "description": "extension description"
+    }
+}

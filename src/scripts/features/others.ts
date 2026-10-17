@@ -1,0 +1,161 @@
+import { BROWSER, SYNC_DEFAULT } from '../defaults.ts'
+import { minutator, suntime } from '../shared/time.ts'
+import { stringMaxSize } from '../shared/generic.ts'
+import { eventDebounce } from '../utils/debounce.ts'
+import { tradThis } from '../utils/translations.ts'
+import { storage } from '../storage.ts'
+import { isTypingTarget } from './links/helpers.ts'
+
+export function favicon(val?: string, isEvent?: true): void {
+    function createFavicon(emoji?: string): void {
+        const svgtext = `<text y=".9em" font-size="85">${emoji}</text>`
+        const svgtag = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${svgtext}</svg>`
+        const svgdata = `data:image/svg+xml,${svgtag}`
+        const defaulticon = `/src/assets/favicons/favicon.ico`
+        const domfavicon = document.querySelector<HTMLLinkElement>('#favicon')
+
+        if (domfavicon) {
+            domfavicon.href = emoji ? svgdata : defaulticon
+        }
+    }
+
+    if (isEvent) {
+        const isEmojiOrShape = val?.match(/[\p{Emoji}\u25A0-\u25FF]/gu) && !val?.match(/[0-9a-z]/g)
+        eventDebounce({ favicon: isEmojiOrShape ? val : '' })
+        document.getElementById('head-favicon')?.remove()
+    }
+
+    if (BROWSER === 'firefox') {
+        setTimeout(() => createFavicon(val), 0)
+    } else {
+        createFavicon(val)
+    }
+}
+
+export function tabTitle(val?: string, isEvent?: true): void {
+    val ??= ''
+
+    const tabTitle = stringMaxSize(val, 80) || tradThis('New tab')
+
+    if (tabTitle !== document.title) {
+        document.title = tabTitle
+    }
+
+    if (isEvent) {
+        eventDebounce({ tabtitle: stringMaxSize(val, 80) })
+    }
+}
+
+export function pageControl(val: { width?: number; gap?: number }, isEvent?: true): void {
+    if (val.width) {
+        const property = `${val.width ?? SYNC_DEFAULT.pagewidth}px`
+        document.documentElement.style.setProperty('--page-width', property)
+
+        if (isEvent) {
+            eventDebounce({ pagewidth: val.width })
+        }
+    }
+
+    if (typeof val.gap === 'number') {
+        const property = `${val.gap ?? SYNC_DEFAULT.pagegap}em`
+        document.documentElement.style.setProperty('--page-gap', property)
+
+        if (isEvent) {
+            eventDebounce({ pagegap: val.gap })
+        }
+    }
+}
+
+let currentThemeMode: string
+export function darkmode(value: 'auto' | 'system' | 'enable' | 'disable', isEvent?: boolean): void {
+    const mediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)')
+    const settings = document.querySelector<HTMLElement>('aside')
+    let theme = 'light'
+    currentThemeMode = value
+
+    switch (value) {
+        case 'disable':
+            theme = 'light'
+            break
+
+        case 'enable':
+            theme = 'dark'
+            break
+
+        case 'system':
+            theme = mediaQuery.matches ? 'dark' : 'light'
+            break
+
+        // auto = "at night"
+        default: {
+            const now = minutator(new Date())
+            const { sunrise, sunset } = suntime()
+            theme = now <= sunrise || now > sunset ? 'dark' : 'light'
+        }
+    }
+
+    document.documentElement.dataset.theme = theme
+
+    if (isEvent) {
+        storage.sync.set({ dark: value })
+        settings?.classList.add('change-theme')
+
+        setTimeout(() => {
+            settings?.classList.remove('change-theme')
+        }, 333)
+
+        return
+    }
+
+    mediaQuery.addEventListener('change', handleThemeChange)
+}
+
+function handleThemeChange(event: MediaQueryListEvent): void {
+    if (currentThemeMode === 'system') {
+        document.documentElement.dataset.theme = event.matches ? 'dark' : 'light'
+    }
+}
+
+export function textShadow(init?: number, event?: number): void {
+    const val = init ?? event
+    document.documentElement.style.setProperty('--text-shadow-alpha', (val ?? 0.2)?.toString())
+
+    if (typeof event === 'number') {
+        eventDebounce({ textShadow: val })
+    }
+}
+
+export function altMode(): void {
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Alt' && !isTypingTarget(event.target)) {
+            document.documentElement.dataset.altMode = 'true'
+        }
+    })
+
+    document.addEventListener('keyup', (event: KeyboardEvent) => {
+        if (event.key === 'Alt') {
+            document.documentElement.dataset.altMode = 'false'
+        }
+    })
+
+    self.addEventListener('blur', () => {
+        document.documentElement.dataset.altMode = 'false'
+    })
+
+    // in case the user clicks on another window whilst alting
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            document.documentElement.dataset.altMode = 'false'
+        }
+    })
+
+    document.addEventListener('contextmenu', () => {
+        document.documentElement.dataset.altMode = 'false'
+    })
+}
+
+// Unfocus address bar on chromium
+// https://stackoverflow.com/q/64868024
+// if (window.location.search !== '?r=1') {
+// 	window.location.assign('index.html?r=1')
+// }

@@ -1,0 +1,21 @@
+name: ci
+on:
+    push:
+        branches:
+            - "*"
+        paths:
+            - "src/**"
+            - "tests/**"
+            - "_locales/**"
+
+jobs:
+    checks:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: denoland/setup-deno@v2
+            - run: |
+                deno lint
+                deno task types
+                deno task test
+                deno task build

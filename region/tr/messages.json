@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "iOS'tan ilham alan, sakin ve odaklanmış bir tarama deneyimi için tasarlanmış güzel ve özelleştirilebilir yeni sekme sayfası.",
+        "description": "extension description"
+    }
+}

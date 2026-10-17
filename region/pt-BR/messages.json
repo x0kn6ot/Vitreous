@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "Uma página inicial personalizável com relógio, datas especiais, player de música e links rápidos.",
+        "description": "extension description"
+    }
+}

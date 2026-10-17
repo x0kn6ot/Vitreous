@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "可自訂時鐘、倒數日、音樂播放器與快速連結的瀏覽器首頁。",
+        "description": "extension description"
+    }
+}

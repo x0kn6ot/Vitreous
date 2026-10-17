@@ -1,0 +1,57 @@
+#interface {
+    position: relative;
+    display: grid;
+    width: 100%;
+    gap: var(--page-gap);
+    max-width: var(--page-width);
+    min-height: 100dvh;
+    padding: 4em 1em 6em 1em;
+    margin: 0 auto;
+    box-sizing: border-box;
+    font-size: var(--font-size);
+    font-family: var(--font-family);
+    font-weight: var(--font-weight);
+    text-shadow: var(--text-shadow-interface);
+    grid-template-areas: var(--grid);
+    transition: opacity var(--load-time-transition), transform 0.33s;
+}
+
+@supports not (min-height: 100dvh) {
+    #image-background-overlay,
+    #interface {
+        min-height: 100vh;
+    }
+}
+
+#interface.pushed {
+    transform: translateX(-100px);
+}
+
+.move-edit #main,
+.move-edit #time,
+.move-edit #linkblocks,
+.move-edit #sb_container,
+.move-edit #quotes_container,
+.move-edit #quotes_container {
+    z-index: 3;
+    cursor: pointer;
+    user-select: none;
+    pointer-events: none;
+}
+
+#main,
+#time,
+#linkblocks,
+#sb_container,
+#quotes_container,
+#quotes_container {
+    place-self: center;
+}
+
+.layout-text-left {
+    text-align: left;
+}
+
+.layout-text-right {
+    text-align: right;
+}

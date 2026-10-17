@@ -1,0 +1,181 @@
+aside {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 3;
+    right: -450px;
+    height: 100vh;
+    min-width: 333px;
+    width: 450px;
+    padding: 0 21px;
+    background-color: color-mix(in srgb, var(--color-settings) 72%, transparent);
+    background-image: linear-gradient(145deg, rgb(255 255 255 / 0.15), rgb(255 255 255 / 0.06) 48%, rgb(150 175 220 /
+        0.08));
+    -webkit-backdrop-filter: blur(16px) saturate(145%);
+    backdrop-filter: blur(16px) saturate(145%);
+    border-left: 1px solid rgb(255 255 255 / 0.18);
+    color: var(--color-text);
+    font-size: 15px;
+    font-weight: 400;
+    text-shadow: none;
+    text-align: initial;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    touch-action: pan-y;
+    box-sizing: border-box;
+    transition: transform 0.33s, background-color 0.33s;
+}
+
+aside.hidden {
+    display: none;
+}
+
+aside.shown {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0) scale(1);
+    visibility: visible;
+    box-shadow: 0 24px 80px rgb(0 0 0 / 0.4);
+}
+
+aside {
+    top: auto;
+    right: auto;
+    bottom: 120px;
+    left: 50%;
+    width: min(450px, calc(100vw - 32px));
+    min-width: 0;
+    height: min(830px, calc(100dvh - 190px));
+    max-height: calc(100dvh - 190px);
+    padding: 0 21px;
+    border: 1px solid rgb(255 255 255 / 0.2);
+    border-radius: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 8px) scale(0.97);
+    visibility: hidden;
+    transition:
+        opacity 0.16s ease,
+        transform 0.18s ease-out,
+        background-color 0.33s,
+        visibility 0s linear 0.24s;
+}
+
+body:has(#settings.shown)::before {
+    position: fixed;
+    z-index: 35;
+    background: rgb(0 0 0 / 0.26);
+    content: '';
+    inset: 0;
+}
+
+#settings {
+    z-index: 40;
+}
+
+#show-settings {
+    z-index: 41;
+}
+
+aside.see-through {
+    opacity: 0.2;
+}
+
+aside.init .dropdown {
+    transition: max-height 0s;
+}
+
+.dropdown {
+    max-height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition: max-height 0.3s, padding 0.2s, margin 0.2s, visibility 0s 0.3s;
+}
+
+.all .as,
+.dropdown.shown {
+    visibility: visible;
+    transition: max-height 0.3s, padding 0.2s, margin 0.2s, visibility 0s 0s;
+}
+
+aside.change-theme .tooltip,
+aside.change-theme .param,
+aside.change-theme select,
+aside.change-theme button,
+aside.change-theme input,
+aside.change-theme hr,
+aside.change-theme {
+    transition-duration: 0.33s;
+    transition-property: background-color, border-color, color;
+}
+
+/*
+ * Devices might have stuttering issues when switching theme.
+ * This optimizes performance by reducing the amount
+ * of DOM elements to recalculate during the transition.
+ */
+aside.change-theme .as_fonts,
+aside.change-theme #cssEditor,
+aside.change-theme #time_options,
+aside.change-theme #main_options,
+aside.change-theme #quotes_options,
+aside.change-theme #searchbar_options,
+aside.change-theme #settings-management {
+    display: none;
+}
+
+#main_title,
+#main_title + .param,
+#quotes_title,
+#quotes_title + .param,
+.as_fonts,
+.as_page,
+.as_updates {
+    display: none !important;
+}
+
+#i_showall {
+    display: none;
+}
+
+#general_title + .param .showall {
+    display: none;
+}
+
+#general_title + .param > hr:first-of-type {
+    display: none;
+}
+
+#time_options > .wrapper:has(#i_analog),
+#analog_options,
+.as_worldclocks,
+#timezone_options {
+    display: none !important;
+}
+
+#time_options > hr:has(+ .wrapper:has(#i_analog)),
+#clocktype_options + hr,
+#timezone_options + hr {
+    display: none;
+}
+
+.day-counter-setting {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 8px;
+    margin: 0 0 10px;
+}
+
+.day-counter-setting label {
+    display: grid;
+    gap: 6px;
+}
+
+.day-counter-setting label span {
+    color: var(--color-light-text);
+    font-size: 0.85em;
+}
+
+#day-counter-options > button {
+    width: 100%;
+}

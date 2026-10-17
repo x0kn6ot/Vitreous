@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "時計、記念日、音楽プレーヤー、クイックリンクをカスタマイズできるブラウザーのスタートページです。",
+        "description": "extension description"
+    }
+}

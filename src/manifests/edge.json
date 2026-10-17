@@ -1,0 +1,38 @@
+{
+    "manifest_version": 3,
+    "name": "__MSG_extensionName__",
+    "short_name": "Vitreous",
+    "version": "1.0.0",
+    "description": "__MSG_extensionDesc__",
+    "author": "Vitreous",
+    "default_locale": "en",
+    "icons": {
+        "128": "src/assets/favicons/favicon-128x128.png"
+    },
+    "chrome_url_overrides": {
+        "newtab": "index.html"
+    },
+    "action": {
+        "title": "__MSG_extensionName__"
+    },
+    "offline_enabled": true,
+    "background": {
+        "service_worker": "src/scripts/service-worker.js"
+    },
+    "permissions": [
+        "storage"
+    ],
+    "host_permissions": [
+        "https://suggestqueries.google.com/*",
+        "https://duckduckgo.com/*",
+        "https://s2.googleusercontent.com/*",
+        "https://zenquotes.io/*",
+        "https://picsum.photos/*",
+        "https://cdn.jsdelivr.net/*"
+    ],
+    "optional_permissions": [
+        "bookmarks",
+        "topSites",
+        "search"
+    ]
+}

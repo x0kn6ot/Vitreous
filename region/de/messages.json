@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "Ein schöner und anpassbarer neuer Tab inspiriert von iOS – für ein ruhiges und fokussiertes Surferlebnis.",
+        "description": "extension description"
+    }
+}

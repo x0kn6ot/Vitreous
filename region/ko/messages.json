@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "시계, 디데이, 음악 플레이어와 바로가기를 꾸밀 수 있는 브라우저 시작 페이지입니다.",
+        "description": "extension description"
+    }
+}

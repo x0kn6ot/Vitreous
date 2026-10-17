@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "A customizable browser start page with your clock, D-Days, music player, and quick links.",
+        "description": "extension description"
+    }
+}

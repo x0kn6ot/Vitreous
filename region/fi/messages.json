@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "Kaunis ja muokattava uusi välilehti iOS:sta inspiroituneena, suunniteltu rauhalliseen ja keskittyneeseen selauskokemukseen.",
+        "description": "extension description"
+    }
+}

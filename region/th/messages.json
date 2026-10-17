@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "หน้าเริ่มต้นเบราว์เซอร์ที่ปรับแต่งนาฬิกา วันสำคัญ เครื่องเล่นเพลง และลิงก์ด่วนได้",
+        "description": "extension description"
+    }
+}

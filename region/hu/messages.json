@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "Egy gyönyörű és testreszabható új lap iOS ihletésű dizájnnal, tervezve egy nyugodt és összpontosított böngészési élményhez.",
+        "description": "extension description"
+    }
+}

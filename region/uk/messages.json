@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "Гарна та настроювана нова вкладка, натхнена iOS, створена для спокійного та зосередженого перегляду інтернету.",
+        "description": "extension description"
+    }
+}

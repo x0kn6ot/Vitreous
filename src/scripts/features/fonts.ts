@@ -1,0 +1,390 @@
+import { getLang, tradThis } from '../utils/translations.ts'
+import { displayInterface } from '../shared/display.ts'
+import { colorInput } from '../shared/dom.ts'
+import { onSettingsLoad } from '../utils/onsettingsload.ts'
+import { eventDebounce } from '../utils/debounce.ts'
+import { networkForm } from '../shared/form.ts'
+import { SYSTEM_OS } from '../defaults.ts'
+import { subsets } from '../langs.ts'
+import { storage } from '../storage.ts'
+import { clock } from './clock/index.ts'
+import { hexToRGB } from '../shared/generic.ts'
+
+import type { Font, Sync } from '../../types/sync.ts'
+
+interface Fontsource {
+    family: string
+    subsets: string[]
+    weights: number[]
+    variable: boolean
+}
+
+const availableFonts: Fontsource[] = [
+    { family: 'Inter', subsets: ['latin'], weights: [300, 400, 500, 600, 700, 800], variable: false },
+    { family: 'Noto Sans KR', subsets: ['latin', 'korean'], weights: [100, 300, 400, 500, 700, 900], variable: false },
+    { family: 'Roboto', subsets: ['latin'], weights: [300, 400, 500, 700, 900], variable: false },
+    { family: 'Open Sans', subsets: ['latin'], weights: [300, 400, 500, 600, 700, 800], variable: false },
+]
+
+type CustomFontUpdate = {
+    autocomplete?: true
+    lang?: true
+    size?: string
+    family?: string
+    weight?: string
+    color?: string
+}
+
+const familyForm = networkForm('f_customfont')
+
+export const systemfont = (() => {
+    const fonts = {
+        fallback: { placeholder: 'Arial', weights: ['500', '600', '800'] },
+        windows: { placeholder: 'Segoe UI', weights: ['300', '400', '600', '700', '800'] },
+        android: { placeholder: 'Roboto', weights: ['100', '300', '400', '500', '700', '900'] },
+        linux: { placeholder: 'Fira Sans', weights: ['100', '200', '300', '400', '500', '600', '700', '800', '900'] },
+        apple: {
+            placeholder: 'SF Pro Display',
+            weights: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+        },
+    }
+
+    if (SYSTEM_OS === 'windows') {
+        return fonts.windows
+    }
+    if (SYSTEM_OS === 'android') {
+        return fonts.android
+    }
+    if (SYSTEM_OS === 'mac') {
+        return fonts.apple
+    }
+    if (SYSTEM_OS === 'ios') {
+        return fonts.apple
+    }
+
+    return fonts.linux
+})()
+
+export function customFont(init?: Font, event?: CustomFontUpdate): void {
+    if (event) {
+        updateCustomFont(event)
+        return
+    }
+
+    if (init) {
+        try {
+            const font = migrateToNewFormat(init)
+            displayFont(font)
+            displayInterface('fonts')
+
+            onSettingsLoad(() => {
+                initFontSettings(font)
+            })
+        } catch (_) {
+            // ...
+        }
+    }
+}
+
+//
+//	Updates
+//
+
+async function updateCustomFont({ family, weight, size, lang, autocomplete, color }: CustomFontUpdate): Promise<void> {
+    if (autocomplete) {
+        setAutocompleteSettings()
+        return
+    }
+
+    const data = await storage.sync.get('font')
+
+    if (family !== undefined) {
+        data.font = await updateFontFamily(data, family)
+    }
+
+    if (weight) {
+        data.font.weight = weight || '400'
+        displayFont(data.font)
+    }
+
+    if (color) {
+        data.font.color = color
+        colorInput('font-color', color)
+
+        setFontColor(color)
+    }
+
+    if (size) {
+        data.font.size = size
+        setFontSize(size)
+    }
+
+    if (lang) {
+        handleLangSwitch(data.font)
+        return
+    }
+
+    eventDebounce({ font: data.font })
+}
+
+async function updateFontFamily(data: Sync, family: string): Promise<Font> {
+    const iWeight = document.getElementById('i_weight') as HTMLInputElement
+    const familyType = family.length === 0 ? 'none' : systemFontChecker(family) ? 'system' : 'fontsource'
+
+    let font: Font = {
+        family: '',
+        system: true,
+        size: data.font.size,
+        weight: SYSTEM_OS === 'windows' ? '400' : '300',
+        weightlist: systemfont.weights,
+        color: data.font.color,
+    }
+
+    switch (familyType) {
+        case 'fontsource': {
+            familyForm.load()
+
+            const newfont = await getNewFont(font, family)
+
+            if (newfont && navigator.onLine) {
+                font = { ...font, ...newfont }
+                displayFont(font)
+                await waitForFontLoad(family)
+                familyForm.accept('i_customfont', family)
+                clock(undefined, {})
+            }
+
+            if (font.family === '') {
+                familyForm.warn(tradThis('Cannot load this font'))
+                return data.font
+            }
+            break
+        }
+
+        case 'system': {
+            font.family = family
+            displayFont(font)
+            familyForm.accept('i_customfont', family)
+            break
+        }
+
+        default: {
+            displayFont(font)
+            familyForm.accept('i_customfont', systemfont.placeholder)
+        }
+    }
+
+    clock(undefined, {})
+    setWeightSettings(font.weightlist)
+    iWeight.value = font.weight
+
+    return font
+}
+
+async function handleLangSwitch(font: Font): Promise<void> {
+    const noCustomOrSystemFont = !font.family || font?.system
+
+    if (noCustomOrSystemFont) {
+        return
+    }
+
+    const newfont = await getNewFont(font, font.family)
+
+    // remove font if not available with subset
+    if (newfont === undefined) {
+        updateCustomFont({ family: '' })
+        return
+    }
+
+    font.family = newfont.family
+    font.weight = newfont.weight
+    font.weightlist = newfont.weightlist
+
+    displayFont(font)
+    setAutocompleteSettings(true)
+}
+
+async function getNewFont(font: Font, newfamily: string): Promise<Font | undefined> {
+    const newfont = availableFonts.find((item) =>
+        item.family.toLowerCase() === newfamily.toLowerCase() && item.subsets.includes(getRequiredSubset())
+    )
+
+    if (newfont) {
+        font.weight = '400'
+        font.system = false
+        font.family = newfamily
+        font.weightlist = newfont.weights.map((w) => w.toString())
+        return font
+    }
+
+    // this undefined return is important
+    // we need to know when no font is found
+    return
+}
+
+function displayFont({ family, size, weight, system, color = '#ffffff' }: Font): void {
+    const clockWeight = Number.parseInt(weight) > 100
+        ? systemfont.weights[systemfont.weights.indexOf(weight) - 1]
+        : weight
+    const subset = getRequiredSubset()
+    const id = family.toLocaleLowerCase().replaceAll(' ', '-')
+    const fontfacedom = document.getElementById('fontface')
+
+    if (!system) {
+        let fontface = `
+			@font-face {font-family: "${family}";
+				src: url(https://cdn.jsdelivr.net/fontsource/fonts/${id}@latest/latin-${weight}-normal.woff2) format('woff2');
+			}
+		`
+
+        if (subset !== 'latin') {
+            fontface += fontface.replace('latin', subset)
+        }
+
+        if (fontfacedom) {
+            fontfacedom.textContent += fontface
+        }
+    }
+
+    document.documentElement.style.setProperty('--font-family', family ? `"${family}", system-ui, sans-serif` : null)
+    document.documentElement.style.setProperty('--font-weight', weight)
+    document.documentElement.style.setProperty('--font-weight-clock', family ? weight : clockWeight)
+    setFontSize(size)
+    setFontColor(color)
+}
+
+function setFontSize(size: string): void {
+    document.documentElement.style.setProperty('--font-size', `${Number.parseInt(size) / 16}em`)
+}
+
+export function setFontColor(color: string): void {
+    const rgbColor = hexToRGB(color)
+
+    document.documentElement.style.setProperty('--font-color', `${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}`)
+}
+
+//
+//	Settings options
+//
+
+function initFontSettings(font?: Font): void {
+    const hasCustomWeights = font && font.weightlist.length > 0
+    const weights = hasCustomWeights ? font.weightlist : systemfont.weights
+    setWeightSettings(weights)
+}
+
+async function setAutocompleteSettings(isLangSwitch?: boolean): Promise<void> {
+    const dlFontfamily = document.querySelector<HTMLDataListElement>('#dl_fontfamily')
+
+    if (isLangSwitch && dlFontfamily?.childNodes) {
+        for (const node of dlFontfamily.childNodes) {
+            node.remove()
+        }
+    }
+
+    if (dlFontfamily?.childElementCount === 0) {
+        const fragment = new DocumentFragment()
+        const requiredSubset = getRequiredSubset()
+
+        for (const item of availableFonts) {
+            if (item.subsets.includes(requiredSubset)) {
+                const option = document.createElement('option')
+                option.textContent = item.family
+                option.value = item.family
+                fragment.appendChild(option)
+            }
+        }
+
+        dlFontfamily?.appendChild(fragment)
+    }
+}
+
+function setWeightSettings(weights: string[]): void {
+    const options = document.querySelectorAll<HTMLOptionElement>('#i_weight option')
+
+    for (const option of options) {
+        option.classList.toggle('hidden', weights.includes(option.value) === false)
+    }
+}
+
+//
+//	Helpers
+//
+
+export async function fontIsAvailableInSubset(lang?: string, family?: string): Promise<boolean | undefined> {
+    const font = availableFonts.find((item) => item.family === family)
+    const subset = getRequiredSubset(lang)
+
+    return font?.subsets.includes(subset)
+}
+
+function systemFontChecker(family: string): boolean {
+    // Needs a special method to detect system fonts.
+    // Because of fingerprinting concerns,
+    // Firefox and safari made fonts.check() useless
+
+    const p = document.createElement('p')
+    p.setAttribute('style', 'position: absolute; opacity: 0; font-family: invalid font;')
+    p.textContent = `mqlskdjfhgpaozieurytwnxbcv?./,;:1234567890${tradThis('New tab')}`
+    document.getElementById('interface')?.prepend(p)
+
+    const firstW = p.getBoundingClientRect().width
+    p.style.fontFamily = `'${family}'`
+
+    const secondW = p.getBoundingClientRect().width
+    const hasLoadedFont = firstW !== secondW
+
+    p.remove()
+
+    return hasLoadedFont
+}
+
+function waitForFontLoad(family: string): Promise<boolean> {
+    return new Promise((resolve) => {
+        let limitcounter = 0
+        let hasLoadedFont = systemFontChecker(family)
+
+        const interval = setInterval(() => {
+            if (hasLoadedFont || limitcounter === 100) {
+                clearInterval(interval)
+                return resolve(true)
+            }
+
+            hasLoadedFont = systemFontChecker(family)
+            limitcounter++
+        }, 100)
+    })
+}
+
+function getRequiredSubset(lang: string = getLang()): string {
+    let subset = 'latin'
+
+    if (lang in subsets) {
+        subset = subsets[lang as keyof typeof subsets]
+    }
+
+    return subset
+}
+
+// 1.19 migration function
+function migrateToNewFormat(font: Font): Font {
+    if (font?.weightlist) {
+        return font
+    }
+
+    if (font.availWeights) {
+        font.weightlist = font.availWeights
+    }
+
+    font.system = systemFontChecker(font.family)
+
+    font.availWeights = undefined
+    font.url = undefined
+
+    storage.local.remove('fontface')
+    storage.local.remove('fonts')
+    storage.sync.remove('font')
+    setTimeout(() => storage.sync.set({ font }))
+
+    return font
+}

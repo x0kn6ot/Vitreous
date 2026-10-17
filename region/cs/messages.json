@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "Krásná a přizpůsobitelná nová karta inspirovaná iOS, navržená pro klidné a soustředěné prohlížení webu.",
+        "description": "extension description"
+    }
+}

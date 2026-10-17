@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "iOS'dan ilhom olgan, sokin va diqqatli ko'rish tajribasi uchun mo'ljallangan chiroyli va moslashtiriluvchi yangi yorliq sahifasi.",
+        "description": "extension description"
+    }
+}

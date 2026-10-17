@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+    <head>
+        <title>New tab</title>
+
+        <meta charset="utf-8" />
+        <meta name="theme-color" content="#000" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no"
+        />
+
+        <!-- default icon -->
+        <!-- icon -->
+        <!-- manifest -->
+        <!-- webext-storage -->
+
+        <link rel="stylesheet" href="src/styles/style.css" />
+        <style type="text/css" id="styles"></style>
+        <style type="text/css" id="fontface"></style>
+
+        <script src="src/scripts/help-mode.js" defer></script>
+        <script src="src/scripts/main.js" defer></script>
+    </head>
+
+    <body class="init loading">
+        <dialog id="contextmenu">
+            <form id="editlink-form">
+                <label id="edit-title" autofocus>
+                    <span class="trn">Title</span>
+                    <input
+                        id="e-title"
+                        type="text"
+                        name="e-title"
+                        maxlength="64"
+                        autocomplete="off"
+                        placeholder="Example"
+                    />
+                </label>
+
+                <label id="edit-url">
+                    <span class="trn">Link</span>
+                    <input
+                        id="e-url"
+                        type="text"
+                        name="e-url"
+                        maxlength="512"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        placeholder="https://example.com"
+                    />
+                </label>
+
+                <label id="edit-icon">
+                    <span class="trn">Icon</span>
+                    <select name="edit-icon" id="e-icon-type">
+                        <option value="auto" class="trn">Website favicon</option>
+                        <option value="file" class="trn">Local file</option>
+                        <option value="url" class="trn">URL</option>
+                    </select>
+                </label>
+
+                <label id="edit-icon-file">
+                    <span class="trn">File</span>
+                    <input id="e-icon-file" type="file" name="edit-icon-file" accept="image/*" />
+                    <span id="e-icon-file-label" class="trn">No file chosen</span>
+                </label>
+
+                <label id="edit-icon-url">
+                    <span class="trn">URL</span>
+                    <input
+                        id="e-icon-url"
+                        type="url"
+                        name="e-icon-url"
+                        maxlength="7600"
+                        autocomplete="off"
+                        placeholder="https://example.com/favicon.ico"
+                    />
+                </label>
+
+                <hr />
+
+                <!-- <button type="submit" class="trn" id="edit-inputs">Submit from inputs</button> -->
+                <button type="submit" class="btn-red" id="edit-delete" formnovalidate>
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-delete"></use>
+                    </svg>
+
+                    <span class="trn">Delete something</span>
+                </button>
+
+                <button type="submit" id="edit-refresh">
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-refresh"></use>
+                    </svg>
+
+                    <span class="trn">Refresh icon</span>
+                </button>
+
+                <button type="submit" id="edit-add">
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-add"></use>
+                    </svg>
+
+                    <span class="trn">Add something</span>
+                </button>
+
+                <button type="submit" id="edit-pin">
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-locked"></use>
+                    </svg>
+
+                    <span class="trn">Pin group</span>
+                </button>
+
+                <button type="submit" id="edit-unpin">
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-unlocked"></use>
+                    </svg>
+
+                    <span class="trn">Unpin group</span>
+                </button>
+
+                <button type="submit" id="edit-unfolder">
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-undo-2"></use>
+                    </svg>
+
+                    <span class="trn">Remove from folder</span>
+                </button>
+
+                <button type="submit" id="edit-apply">
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-save"></use>
+                    </svg>
+                    <span class="trn">Apply changes</span>
+                </button>
+                <button type="submit" class="trn" id="edit-synced">Synced links cannot be modified</button>
+            </form>
+
+            <div id="contextActions">
+                <button
+                    data-action="openTheseSettings"
+                    data-attribute="time_title"
+                    title="Open the time settings"
+                    aria-label="Open the time settings"
+                >
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-time"></use>
+                    </svg>
+                    <span class="trn">Edit time settings</span>
+                </button>
+
+                <button
+                    data-action="openTheseSettings"
+                    data-attribute="quotes_title"
+                    title="Open the quotes settings"
+                    aria-label="Open the quotes settings"
+                >
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-quotes"></use>
+                    </svg>
+                    <span class="trn">Edit quotes settings</span>
+                </button>
+
+                <button
+                    data-action="openTheseSettings"
+                    data-attribute="background_title"
+                    title="Open the background settings"
+                    aria-label="Open the background settings"
+                >
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-background"></use>
+                    </svg>
+                    <span class="trn">Edit background settings</span>
+                </button>
+
+                <button
+                    data-action="openTheseSettings"
+                    data-attribute="searchbar_title"
+                    title="Open the search bar settings"
+                    aria-label="Open the search bar settings"
+                >
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-searchbar"></use>
+                    </svg>
+                    <span class="trn">Edit search bar settings</span>
+                </button>
+
+                <!-- to be added when new move elem is done -->
+                <!-- <button
+                    data-action="openTheseSettings"
+                    data-attribute="layout_title"
+                    title="Open the layout settings"
+                    aria-label="Open the layout settings"
+                >
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-layout"></use>
+                    </svg>
+
+                    <span class="trn">Edit layout settings</span>
+                </button> -->
+
+                <button
+                    data-action="openTheseSettings"
+                    data-attribute="links_title"
+                    title="Open the quick links settings"
+                    aria-label="Open the quick links settings"
+                >
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-links"></use>
+                    </svg>
+                    <span class="trn">Edit quick links settings</span>
+                </button>
+
+                <button data-action="add-new-link" title="Create a new quick link" aria-label="Create a new quick link">
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-add"></use>
+                    </svg>
+                    <span class="trn">Add new quick link</span>
+                </button>
+            </div>
+
+            <button
+                id="b_interface-quotes-refresh"
+                class="refresh-btn"
+                title="Switch to the next quote"
+                aria-label="Switch to the next quote"
+            >
+                <span class="iconContainer">
+                    <svg class="contextmenu-icon" aria-hidden="true">
+                        <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-background-refresh"></use>
+                    </svg>
+                </span>
+                <span class="trn">Next quote</span>
+            </button>
+
+            <div id="background-actions">
+                <hr />
+                <a id="download-background"></a>
+
+                <div class="buttons">
+                    <button
+                        id="b_interface-background-mute"
+                        class="not-safari"
+                        title="Enable or disable background video sound"
+                        aria-label="Enable or disable background video sound"
+                    >
+                        <span id="interface-background-mute-icon" class="iconContainer">
+                            <svg class="contextmenu-icon" aria-hidden="true">
+                                <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-mute"></use>
+                            </svg>
+                        </span>
+
+                        <span class="trn" id="interface-background-mute-string">Mute video background</span>
+
+                        <span id="interface-background-unmute-icon" class="iconContainer">
+                            <svg class="contextmenu-icon" aria-hidden="true">
+                                <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-unmute"></use>
+                            </svg>
+                        </span>
+
+                        <span class="trn" id="interface-background-unmute-string">Unmute video background</span>
+                    </button>
+
+                    <button
+                        id="b_interface-background-download"
+                        title="Download the current background"
+                        aria-label="Download the current background"
+                        class="idle"
+                    >
+                        <span id="idle-download" class="iconContainer">
+                            <svg class="contextmenu-icon" aria-hidden="true">
+                                <use
+                                    href="src/assets/interface/contextmenu-sprites.svg#contextmenu-background-download"
+                                ></use>
+                            </svg>
+                        </span>
+
+                        <span id="is-downloading" class="iconContainer">
+                            <svg
+                                class="spin"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z"
+                                    opacity=".25"
+                                />
+                                <path
+                                    d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z"
+                                />
+                            </svg>
+                        </span>
+                        <span class="trn">Download background</span>
+                    </button>
+
+                    <button
+                        id="b_interface-background-pause"
+                        title="Lock the current background"
+                        aria-label="Lock the current background"
+                    >
+                        <span id="interface-background-pause-icon" class="iconContainer">
+                            <svg class="contextmenu-icon" aria-hidden="true">
+                                <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-locked"></use>
+                            </svg>
+                        </span>
+
+                        <span class="trn" id="interface-background-pause-string">Lock current background</span>
+
+                        <span id="interface-background-play-icon" class="iconContainer">
+                            <svg class="contextmenu-icon" aria-hidden="true">
+                                <use href="src/assets/interface/contextmenu-sprites.svg#contextmenu-unlocked"></use>
+                            </svg>
+                        </span>
+
+                        <span class="trn" id="interface-background-play-string">Unlock current background</span>
+                    </button>
+
+                    <button
+                        id="b_interface-background-refresh"
+                        class="refresh-btn"
+                        title="Change to another background"
+                        aria-label="Change to another background"
+                    >
+                        <span class="iconContainer">
+                            <svg class="contextmenu-icon" aria-hidden="true">
+                                <use
+                                    href="src/assets/interface/contextmenu-sprites.svg#contextmenu-background-refresh"></use>
+                            </svg>
+                        </span>
+                        <span class="trn">Next background</span>
+                    </button>
+                </div>
+            </div>
+        </dialog>
+
+        <dialog id="element-mover" class="hidden">
+            <div id="grid-selection">
+                <p class="trn">Editing</p>
+                <h3 id="mover-title" class="trn">No selection</h3>
+            </div>
+
+            <div>
+                <p class="trn">Grid position</p>
+                <div id="grid-mover" class="mover">
+                    <button type="button" data-row="-1">
+                        <i class="chevron rotate-half"></i>
+                    </button>
+                    <button type="button" data-col="-1">
+                        <i class="chevron rotate-quart"></i>
+                    </button>
+                    <button type="button" data-col="1">
+                        <i class="chevron rotate-quart-r"></i>
+                    </button>
+                    <button type="button" data-row="1">
+                        <i class="chevron"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="grid-spanner-container">
+                <button class="grid-spanner trn" id="grid-span-rows">Fill row</button>
+                <button class="grid-spanner trn" id="grid-span-cols">Fill column</button>
+            </div>
+            <div>
+                <p class="trn">Box alignment</p>
+                <div id="box-alignment-mover" class="mover">
+                    <button type="button" data-align="baseline">
+                        <i class="box-corner"></i>
+                    </button>
+                    <button type="button" data-align="baseline center">
+                        <i class="box-side rotate-half"></i>
+                    </button>
+                    <button type="button" data-align="baseline end">
+                        <i class="box-corner rotate-quart"></i>
+                    </button>
+                    <button type="button" data-align="center baseline">
+                        <i class="box-side rotate-quart"></i>
+                    </button>
+                    <button type="button" data-align="center">
+                        <i class="box-center"></i>
+                    </button>
+                    <button type="button" data-align="center end">
+                        <i class="box-side rotate-quart-r"></i>
+                    </button>
+                    <button type="button" data-align="end baseline">
+                        <i class="box-corner rotate-quart-r"></i>
+                    </button>
+                    <button type="button" data-align="end center">
+                        <i class="box-side"></i>
+                    </button>
+                    <button type="button" data-align="end">
+                        <i class="box-corner rotate-half"></i>
+                    </button>
+                </div>
+            </div>
+            <div>
+                <p class="trn">Text alignment</p>
+                <div id="text-alignment-mover" class="mover">
+                    <button data-align="left">
+                        <i class="text-left"></i>
+                    </button>
+                    <button data-align="center">
+                        <i class="text-center"></i>
+                    </button>
+                    <button data-align="right">
+                        <i class="text-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="close-mover-wrapper">
+                <hr />
+
+                <button id="b_resetlayout" class="trn btn-red">Reset layout</button>
+                <button id="close-mover" class="trn">Done</button>
+            </div>
+        </dialog>
+
+        <div id="background-wrapper" class="hidden" data-type="images">
+            <div id="background-media"></div>
+            <div id="background-color"></div>
+        </div>
+
+        <main id="interface">
+            <div id="time">
+                <div id="time-container" data-hide="clock">
+                    <div id="clock-wrapper" class="clock-wrapper" data-index="0">
+                        <h1 class="digital" data-hide="clock">
+                            <span class="digital-hh-leading-zero">0</span><span
+                                class="digital-hh"
+                            ></span><span
+                                class="digital-hh-separator"
+                            >:</span><span
+                                class="digital-mm"
+                            ></span><span
+                                class="digital-mm-separator"
+                            >:</span><span
+                                class="digital-ss"
+                            >
+                                <!-- prettier-ignore -->
+                            </span><span class="digital-ampm"><span class="digital-am">am</span><span class="digital-pm"
+                                >pm</span></span>
+                        </h1>
+
+                        <p class="clock-region">Paris</p>
+
+                        <p class="clock-date" data-hide="date">
+                            <span class="clock-date-aa"></span><span class="clock-date-aa-separator"></span>
+                            <span class="clock-date-bb"></span>
+                            <span class="clock-date-bb-separator"></span>
+                            <span class="clock-date-cc"></span>
+                            <span class="clock-date-secondary"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="sb_container" class="hidden">
+                <div id="searchbar-wrapper">
+                    <input
+                        id="searchbar"
+                        type="text"
+                        name="searchbar"
+                        autocomplete="off"
+                        spellcheck="false"
+                        aria-label="Search bar"
+                    />
+
+                    <div id="sb-buttons">
+                        <button id="sb_empty" aria-label="Empty search" type="button" disabled>✕</button>
+
+                        <hr />
+
+                        <button id="sb_submit" aria-label="Submit search" type="submit" disabled>
+                            <svg class="default-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path
+                                    fill="currentColor"
+                                    d="M495 466 385 356a209 209 0 0 0-14-283 209 209 0 0 0-298 0 209 209 0 0 0 0 298 210 210 0 0 0 283 14l110 110a20 20 0 1 0 29-29zM102 342a169 169 0 0 1 0-240 169 169 0 0 1 240 0 169 169 0 0 1 0 240 169 169 0 0 1-240 0z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <ul id="sb-suggestions"></ul>
+            </form>
+
+            <div id="linkblocks">
+                <div id="link-mini">
+                    <div></div>
+                </div>
+            </div>
+
+            <div id="quotes_container" class="hidden">
+                <p id="quote"></p>
+                <p id="author"></p>
+                <a id="quote-credit" href="https://zenquotes.io/" target="_blank"
+                    rel="noreferrer">명언 제공: ZenQuotes</a>
+            </div>
+        </main>
+
+        <div id="credit-container">
+            <div id="credit"></div>
+        </div>
+
+        <div id="show-settings" data-hide="settingsicon">
+            <button aria-label="Toggle settings menu" title="Toggle settings menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="199.66" height="199.93" viewBox="0 0 52.83 52.9">
+                    <path
+                        fill="var(--icon-color, #fff)"
+                        d="M29.73 52.57c-.26-.2-.93-1.41-1.48-2.71-1.1-2.57-1.42-2.93-2.42-2.68-.51.13-.89.66-1.67 2.36-1.2 2.59-1.6 3.11-2.4 3.11-1.1 0-1.35-.58-1.51-3.48-.13-2.38-.23-2.78-.73-3.2-.32-.25-.7-.46-.84-.46s-1.25.95-2.46 2.12c-1.22 1.16-2.38 2.11-2.59 2.11-.52 0-1.25-.86-1.25-1.49 0-.28.3-1.56.67-2.84 1.12-3.84.46-4.31-3.47-2.54-2.15.98-2.6 1.1-3.16.83-1.08-.49-.85-1.45.93-3.9 1.72-2.37 1.91-3.07 1-3.66-.5-.3-1.06-.33-3.2-.11-2.9.29-3.27.22-3.6-.64-.33-.89.05-1.37 2.2-2.83 1.07-.72 2.14-1.5 2.38-1.74 1.1-1.1.16-1.97-2.97-2.78C.38 27.33-.28 26.82.1 25.72c.23-.64.53-.79 2.97-1.42 1.5-.4 2.9-.85 3.1-1.03.77-.63.46-1.54-.84-2.44-2.35-1.62-3.8-2.85-3.8-3.21 0-.2.22-.64.5-.97.48-.6.5-.6 3.35-.3 2.56.29 2.9.27 3.34-.12.27-.24.48-.64.48-.89 0-.24-.7-1.5-1.58-2.8-.88-1.29-1.59-2.53-1.59-2.77 0-.48.8-1.3 1.27-1.3.17 0 1.43.56 2.8 1.24 2.22 1.1 2.59 1.2 3.19.93.84-.38.86-.96.13-3.82-.68-2.68-.61-3.42.36-3.76.68-.24.87-.12 2.91 1.91 1.2 1.2 2.37 2.17 2.6 2.17.88 0 1.26-.89 1.54-3.7C21.13.59 21.4 0 22.44 0c.67 0 1.17.71 2.24 3.23 1.48 3.46 2.38 3.5 3.98.14C29.95.65 30.26.27 31.2.27c1 0 1.19.46 1.38 3.53.09 1.44.3 2.78.46 2.98.68.82 1.61.4 3.7-1.62 1.12-1.1 2.18-1.98 2.35-1.98.17 0 .54.12.82.27.7.38.66 1.39-.2 4.23-.68 2.3-.68 2.38-.21 2.9.66.74 1.06.68 3.67-.53 2.43-1.12 3.04-1.25 3.55-.74.64.64.3 1.64-1.3 3.84-1.28 1.78-1.57 2.35-1.44 2.88.23.9.9 1.09 3.14.86 3.25-.32 3.57-.29 4.05.44.38.6.39.72.03 1.27-.22.34-1.35 1.24-2.52 2-1.16.77-2.17 1.6-2.23 1.85-.25.92.26 1.59 1.44 1.9 3.93 1.02 4.7 1.33 4.86 1.96.3 1.24-.22 1.63-3.05 2.28-4.1.92-4.48 1.93-1.54 3.95 3.15 2.17 3.63 2.89 2.59 3.84-.48.43-.74.45-3.34.15-2.55-.28-2.85-.27-3.3.14-.28.25-.5.65-.5.88 0 .24.7 1.49 1.58 2.78.87 1.29 1.59 2.56 1.59 2.83s-.31.69-.69.93c-.67.44-.74.42-3.3-.83-2.3-1.14-2.68-1.25-3.28-.98-.84.38-.87 1.09-.13 3.74.71 2.56.62 3.5-.36 3.84-.7.25-.86.14-2.88-1.91-3.1-3.16-3.7-2.93-4.14 1.52-.21 2.1-.39 2.85-.74 3.11-.58.43-.93.42-1.53-.01zm.75-10.23c1.12-.29 2.78-.91 3.68-1.39a20.16 20.16 0 0 0 6.23-5.87c1.16-2.37 2.24-4.33 2.02-6.9l-7.43-.07c-6.82-.07-7.46-.03-7.85.4-.77.86-7.08 12.01-7.08 12.51 0 1.57 6.34 2.37 10.43 1.32zm-9.73-9.13c1.96-3.4 3.53-6.38 3.53-6.75 0-1.03-6.91-12.82-7.57-12.91-.74-.11-3.68 3.05-4.8 5.16a16.98 16.98 0 0 0-.02 15.46c1.12 2.1 4.08 5.3 4.8 5.2.39-.06 1.5-1.76 4.06-6.16zm21.18-12.13A17 17 0 0 0 30.1 10.42c-3.53-.89-9.8-.02-10 1.38-.08.5 6.05 11.48 7.03 12.61.38.43 1.02.46 7.84.4l7.43-.07c.19-1.27-.1-2.6-.48-3.66z"
+                    />
+                </svg>
+            </button>
+        </div>
+
+        <aside id="settings" class="init hidden" style="display: none">
+            <!-- settings -->
+        </aside>
+
+        <div id="templates">
+            <template id="bookmarks-dialog-template">
+                <dialog id="bookmarks">
+                    <div id="bookmarks-header">
+                        <div id="bookmarks-intro">
+                            <!-- deno-fmt-ignore -->
+                            <span class="trn">
+                                Browser bookmarks can be imported into Quick Links.
+                            </span>
+                        </div>
+
+                        <div id="bookmarks-buttons">
+                            <button id="bmk_close" class="trn btn-red">Close</button>
+                            <button id="bmk_apply" class="trn" disabled>Import selection</button>
+                        </div>
+                    </div>
+
+                    <div id="bookmarks-container"></div>
+                </dialog>
+            </template>
+
+            <template id="bookmarks-folder-template">
+                <div class="bookmarks-folder">
+                    <div class="bookmarks-folder-title">
+                        <h2>
+                            <span class="bookmarks-folder-title-content"></span>
+                            <span class="bookmarks-folder-title-synced trn">(synced)</span>
+                        </h2>
+                        <div>
+                            <button class="trn b_bookmarks-folder-select">Select group</button>
+                            <button class="trn b_bookmarks-folder-sync" disabled>Sync with browser</button>
+                        </div>
+                    </div>
+                    <ol></ol>
+                </div>
+            </template>
+
+            <template id="bookmarks-item-template">
+                <li>
+                    <button>
+                        <img draggable="false" loading="lazy" alt="" />
+                        <p class="bookmark-title"></p>
+                        <p class="bookmark-url"></p>
+                    </button>
+                </li>
+            </template>
+
+            <template id="link-group-template">
+                <div class="link-group">
+                    <ul class="link-list"></ul>
+                    <button class="link-title"></button>
+                </div>
+            </template>
+
+            <template id="link-elem-template">
+                <li class="link link-elem">
+                    <a rel="noreferrer noopener" draggable="false">
+                        <div class="link-icon">
+                            <img alt="" draggable="false" />
+                        </div>
+                        <span class="link-elem-title"></span>
+                    </a>
+                </li>
+            </template>
+
+            <template id="link-folder-template">
+                <li class="link link-folder" tabindex="0">
+                    <div class="link-icon">
+                        <img alt="" draggable="false" />
+                        <img alt="" draggable="false" />
+                        <img alt="" draggable="false" />
+                        <img alt="" draggable="false" />
+                    </div>
+
+                    <span class="link-elem-title"></span>
+                </li>
+            </template>
+
+            <!-- help-mode -->
+            <style>
+            #help-mode-prompt {
+                position: fixed;
+                top: 40vh;
+                left: 0;
+                right: 0;
+                color: #eeeeee;
+                font-family: system-ui;
+                font-size: 1em;
+                text-align: center;
+                z-index: 1;
+            }
+
+            #help-mode-prompt h1 {
+                margin-bottom: 0;
+            }
+
+            #help-mode-prompt p {
+                margin-top: 0.5em;
+            }
+
+            #help-buttons {
+                margin-top: 1.5em;
+                display: flex;
+                justify-content: center;
+                gap: 1em;
+            }
+
+            .help-btn {
+                cursor: pointer;
+                height: 31px;
+                padding: 0 1em;
+                color: rgb(var(--accent-color));
+                border: none;
+                border-radius: 1em;
+                white-space: nowrap;
+                background-color: rgb(var(--accent-color) / 0.25);
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .help-btn:hover {
+                background-color: rgb(var(--accent-color) / 0.35);
+            }
+
+            .help-btn[disabled] {
+                color: #777777;
+                background-color: #282828;
+                cursor: not-allowed;
+            }
+
+            .help-btn.danger:hover {
+                color: rgb(var(--danger-color));
+                background-color: rgb(var(--danger-color) / 0.25);
+            }
+            </style>
+        </div>
+    </body>
+</html>

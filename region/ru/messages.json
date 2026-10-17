@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "Настраиваемая стартовая страница браузера с часами, памятными датами, музыкальным плеером и быстрыми ссылками.",
+        "description": "extension description"
+    }
+}

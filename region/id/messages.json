@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Vitreous",
+        "description": "extension name"
+    },
+    "extensionDesc": {
+        "message": "Halaman tab baru yang indah dan dapat dikustomisasi, terinspirasi dari iOS, dirancang untuk pengalaman browsing yang tenang dan fokus.",
+        "description": "extension description"
+    }
+}
