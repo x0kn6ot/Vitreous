@@ -15,6 +15,12 @@
 
 Vitreous brings the essentials of a start page into one simple, glass-inspired space. Keep your time, important dates, music, search, and favorite links close at hand.
 
+## Preview
+
+![Vitreous with a forest background](docs/images/vitreous-forest-preview.png)
+
+![Vitreous with an architectural background](docs/images/vitreous-architecture-preview.png)
+
 ## Features
 
 - A clock and date with customizable display options
