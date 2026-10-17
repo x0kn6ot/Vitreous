@@ -32,10 +32,21 @@ Vitreous brings the essentials of a start page into one simple, glass-inspired s
 
 ## Install
 
+### Chrome and Edge
+
 1. Extract the Vitreous extension package to a folder.
 2. Open `chrome://extensions` in Chrome or `edge://extensions` in Edge.
 3. Turn on **Developer mode**.
 4. Select **Load unpacked** and choose the extracted Vitreous folder.
+
+### Firefox
+
+1. Extract the Firefox package to a folder.
+2. Open `about:debugging#/runtime/this-firefox` in Firefox.
+3. Select **Load Temporary Add-on…**.
+4. Open the extracted folder and select its `manifest.json` file.
+
+Firefox removes temporary add-ons when it closes. To build the Firefox package from source, run `deno task build` and use the Firefox output in `release/firefox/`.
 
 ## Build from source
 
